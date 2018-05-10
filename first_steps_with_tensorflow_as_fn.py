@@ -76,7 +76,7 @@ def train_model(learning_rate, steps, batch_size, input_feature="total_rooms"):
     feature_columns = [tf.feature_column.numeric_column(my_feature)]
 
     # Create input functions.
-    training_input_fn = lambda: my_input_fn(my_feature_data, targets)
+    training_input_fn = lambda: my_input_fn(my_feature_data, targets, batchsize=batch_size)
     prediction_input_fn = lambda: my_input_fn(my_feature_data, targets, num_epochs=1, shuffle=False)
 
     # Create a linear regressor object.
@@ -150,6 +150,7 @@ def train_model(learning_rate, steps, batch_size, input_feature="total_rooms"):
 
     print "Final RMSE (on training data): %0.2f" % root_mean_squared_error
 
+
 # this combination gets a RMSE of 225.63
 # train_model(
 #     learning_rate=0.00001,
@@ -161,8 +162,36 @@ def train_model(learning_rate, steps, batch_size, input_feature="total_rooms"):
 # TASK 1 -> GET RMSE LOWER THAN 180 #
 #####################################
 # Final RMSE = 166.74
+# train_model(
+#     learning_rate=0.0001,
+#     steps=100,
+#     batch_size=1
+# )
+
+# Solution of the course -> RMSE = 167.79 -> Higher tha  above
+# train_model(
+#     learning_rate=0.00002,
+#     steps=500,
+#     batch_size=1
+# )
+
+##################################################################################################
+# TASK 2                                                                                         #
+# See if you can do any better by replacing the total_rooms feature with the population feature. #
+##################################################################################################
+# Final RMSE -> 176.84
 train_model(
-    learning_rate=0.0001,
-    steps=100,
-    batch_size=1
+    learning_rate=0.00003,
+    steps=900,
+    input_feature='population',
+    batch_size=4
 )
+
+# COURSE SOLUTION
+# Final RMSE -> 175.97
+# train_model(
+#     learning_rate=0.00002,
+#     steps=1000,
+#     batch_size=5,
+#     input_feature="population"
+# )
