@@ -150,9 +150,19 @@ def train_model(learning_rate, steps, batch_size, input_feature="total_rooms"):
 
     print "Final RMSE (on training data): %0.2f" % root_mean_squared_error
 
+# this combination gets a RMSE of 225.63
+# train_model(
+#     learning_rate=0.00001,
+#     steps=100,
+#     batch_size=1
+# )
 
+#####################################
+# TASK 1 -> GET RMSE LOWER THAN 180 #
+#####################################
+# Final RMSE = 166.74
 train_model(
-    learning_rate=0.00001,
+    learning_rate=0.0001,
     steps=100,
     batch_size=1
 )
