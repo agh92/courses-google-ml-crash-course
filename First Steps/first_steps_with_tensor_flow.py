@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn import metrics
 import tensorflow as tf
-from tensorflow.python.data import Dataset
+from miscelanius.functions import my_input_fn
 
 #########
 # SETUP #
@@ -12,7 +12,7 @@ from tensorflow.python.data import Dataset
 tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
-california_housing_dataframe = pd.read_csv("data/california_housing_train.csv", sep=",")
+california_housing_dataframe = pd.read_csv("../data/california_housing_train.csv", sep=",")
 # randomize to prevent ordering effects
 california_housing_dataframe = california_housing_dataframe.reindex(np.random.permutation(california_housing_dataframe.index))
 # scale median house value to make the learning process easier
@@ -37,34 +37,6 @@ my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0000001)
 my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
 # Actual prediction model
 linear_regressor = tf.estimator.LinearRegressor(feature_columns=feature_column_total_rooms, optimizer=my_optimizer)
-
-
-# This function tells TensorFlow how to preprocess the data, as well as how to batch, shuffle, and
-# repeat it during model training.
-def my_input_fn(features, targets, batchsize=1, shuffle=True, num_epochs=None):
-    """
-    :param features: pandas DataFrame of features
-    :param targets: pandas DataFrame of targets
-    :param batchsize: Size of batches to be passed to the model
-    :param shuffle: True or False. Whether to shuffle the data.
-    :param num_epochs: Number of epochs for which data should be repeated. None = repeat indefinitely
-    :return: Tuple of (features, labels) for next data batch
-    """
-    # print 'my_input_fn'
-    # convert panda data into a dict of numpy arrays
-    features = {key: np.array(value) for key, value in dict(features).items()}
-    # Features is a dict of one key and one value total_rooms: np.array(vals)
-
-    # Define the data set to train the model with
-    data_set = Dataset.from_tensor_slices((features, targets))  # WARNING! 2GB MAX
-    data_set = data_set.batch(batchsize).repeat(num_epochs)
-
-    if shuffle:
-        data_set.shuffle(buffer_size=10000)
-
-    # define and return the batch of data
-    features, labels = data_set.make_one_shot_iterator().get_next()
-    return features, labels
 
 ###################
 # DO THE TRAINING #
