@@ -6,7 +6,7 @@ Code and exercises from [Google´s Machine Learning Crash Course](https://develo
 1. Load data as pandas [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)
 2. Define the input features as pandas [`Series`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.html)
 3. Define the targets as pandas `Series`
-4. Define an optimizer to reduce loss
+4. Define an optimizer from [`tensorflow.train`](https://www.tensorflow.org/api_docs/python/tf/train) to reduce loss
 5. Define the type of the model as [`tf.estimator`](https://www.tensorflow.org/api_docs/python/tf/estimator)
 6. Define the input function that provides de estimator with a tuple of features and labels
 7. Train the model
