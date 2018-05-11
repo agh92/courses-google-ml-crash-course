@@ -1,5 +1,5 @@
 # google_ml_crash_course
-Code and exercises of the Machine Learning Crash Course
+Code and exercises from [Google´s Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course/)
 
 ## Steps to create a model
 
