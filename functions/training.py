@@ -7,9 +7,26 @@ import pandas as pd
 from sklearn import metrics
 import tensorflow as tf
 import functions.data_processing as dp
+from functions import ploting
 
 
-def train_model_single_feature(data_frame, learning_rate, steps, batch_size, input_feature="total_rooms", show=True):
+def custom_linear_regressor(learning_rate, feature_columns):
+    # Create a linear regressor object.
+    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+    return tf.estimator.LinearRegressor(
+        feature_columns=feature_columns,
+        optimizer=my_optimizer
+    )
+
+
+def train_model_single_feature(
+        data_frame,
+        learning_rate,
+        steps,
+        batch_size,
+        input_feature="total_rooms",
+        show=True):
     """Trains a linear regression model of one feature.
 
     total_number_of_trained_examples = steps * batch_size
@@ -41,23 +58,14 @@ def train_model_single_feature(data_frame, learning_rate, steps, batch_size, inp
     training_input_fn = lambda: dp.my_input_fn(my_feature_data, targets, batchsize=batch_size)
     prediction_input_fn = lambda: dp.my_input_fn(my_feature_data, targets, num_epochs=1, shuffle=False)
 
-    # Create a linear regressor object.
-    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
-    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
-    linear_regressor = tf.estimator.LinearRegressor(
-        feature_columns=feature_columns,
-        optimizer=my_optimizer
-    )
+    linear_regressor = custom_linear_regressor(learning_rate, feature_columns)
 
     # Set up to plot the state of our model's line each period.
     plt.figure(figsize=(15, 6))
     plt.subplot(1, 2, 1)
-    plt.title("Learned Line by Period")
-    plt.ylabel(my_label)
-    plt.xlabel(my_feature)
     sample = data_frame.sample(n=300)
-    plt.scatter(sample[my_feature], sample[my_label])
-    colors = [cm.coolwarm(x) for x in np.linspace(-1, 1, periods)]
+    colors = ploting.state_line(sample=sample, my_feature=my_feature,
+                                my_label=my_label, periods=periods)
 
     # Train the model, but do so inside a loop so that we can periodically assess
     # loss metrics.
@@ -98,13 +106,7 @@ def train_model_single_feature(data_frame, learning_rate, steps, batch_size, inp
 
     # Output a graph of loss metrics over periods.
     plt.subplot(1, 2, 2)
-    plt.ylabel('RMSE')
-    plt.xlabel('Periods')
-    plt.title("Root Mean Squared Error vs. Periods")
-    plt.tight_layout()
-    plt.plot(root_mean_squared_errors)
-    if show:
-        plt.show()
+    ploting.loss_over_periods({'training': root_mean_squared_errors}, show=show)
 
     # Output a table with calibration data.
     calibration_data = pd.DataFrame()
@@ -127,13 +129,8 @@ def train_model_multi_feature(
         show=True):
     periods = 10
     steps_per_period = steps / periods
-    # Create a linear regressor object.
-    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
-    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
-    linear_regressor = tf.estimator.LinearRegressor(
-        feature_columns=dp.construct_feature_columns(training_examples),
-        optimizer=my_optimizer
-    )
+
+    linear_regressor = custom_linear_regressor(learning_rate, dp.construct_feature_columns(training_examples))
 
     # Feed for training
     training_input_fn = lambda: dp.my_input_fn(
@@ -188,15 +185,6 @@ def train_model_multi_feature(
     print "Model training finished."
 
     # Output a graph of loss metrics over periods.
-    plt.ylabel("RMSE")
-    plt.xlabel("Periods")
-    plt.title("Root Mean Squared Error vs. Periods")
-    plt.tight_layout()
-    plt.plot(training_rmse, label="training")
-    plt.plot(validation_rmse, label="validation")
-    plt.legend()
-    if show:
-        plt.show()
+    ploting.loss_over_periods({"training": training_rmse, "validation": validation_rmse}, show=show)
 
     return linear_regressor
-

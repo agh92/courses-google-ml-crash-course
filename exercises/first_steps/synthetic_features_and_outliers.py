@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from functions.training import train_model_single_feature
+from functions.data_processing import load_data_frame_from_csv
 
 #########
 # SETUP #
@@ -10,10 +11,9 @@ from functions.training import train_model_single_feature
 tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
-california_housing_dataframe = pd.read_csv("../../data/california_housing_train.csv", sep=",")
-# randomize to prevent ordering effects
-california_housing_dataframe = california_housing_dataframe.reindex(
-    np.random.permutation(california_housing_dataframe.index))
+
+california_housing_dataframe = load_data_frame_from_csv("../../data/california_housing_train.csv")
+
 # scale median house value to make the learning process easier
 california_housing_dataframe['median_house_value'] /= 1000
 # print california_housing_dataframe.describe()

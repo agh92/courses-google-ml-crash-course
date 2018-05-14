@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 from sklearn import metrics
 import tensorflow as tf
-from functions.data_processing import my_input_fn
+from functions.data_processing import *
 
 #########
 # SETUP #
@@ -12,23 +12,18 @@ from functions.data_processing import my_input_fn
 tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
-california_housing_dataframe = pd.read_csv("../../data/california_housing_train.csv", sep=",")
-# randomize to prevent ordering effects
-california_housing_dataframe = california_housing_dataframe.reindex(
-    np.random.permutation(california_housing_dataframe.index))
-# scale median house value to make the learning process easier
-california_housing_dataframe['median_house_value'] /= 1000
+
+california_housing_dataframe = load_data_frame_from_csv("../../data/california_housing_train.csv")
 print california_housing_dataframe.describe()
 
 ###################
 # BUILD THE MODEL #
 ###################
-# input feature
+# input feature and numeric columns
 total_rooms_feature = california_housing_dataframe[['total_rooms']]
-# numeric feature column
-feature_column_total_rooms = [tf.feature_column.numeric_column('total_rooms')]
+feature_column_total_rooms = construct_feature_columns(total_rooms_feature)
 # target we want to predict
-targets = california_housing_dataframe['median_house_value']
+targets = preprocess_targets(california_housing_dataframe)
 
 #######################
 # CONFIGURE THE MODEL #
@@ -37,8 +32,10 @@ targets = california_housing_dataframe['median_house_value']
 my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=0.0000001)
 my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
 # Actual prediction model
-linear_regressor = tf.estimator.LinearRegressor(feature_columns=feature_column_total_rooms, optimizer=my_optimizer)
-
+linear_regressor = tf.estimator.LinearRegressor(
+    feature_columns=feature_column_total_rooms,
+    optimizer=my_optimizer
+)
 ###################
 # DO THE TRAINING #
 ###################
