@@ -11,7 +11,7 @@ Code and exercises from [Google´s Machine Learning Crash Course](https://develo
 6. Define the input function that provides de estimator with a tuple of features and labels
 7. Train the model
 8. Make Predictions
-9. Calculate loss
+9. Compute loss using [`tf.metrics`](https://www.tensorflow.org/api_docs/python/tf/metrics) or [`sklearn.metrics`](http://scikit-learn.org/stable/modules/classes.html#sklearn-metrics-metrics) helper functions
 
 ## Clipping Data
 
