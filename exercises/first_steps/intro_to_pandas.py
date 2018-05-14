@@ -13,14 +13,15 @@ population = pd.Series([852469, 1015785, 485199])
 # The dict maps column names to respective series -> Missing values fill with NA/NaN
 cities = pd.DataFrame({'City Name': city_names, 'Population':population})
 
-#################################
-# ACCES DATA WITH dict/list OPS #
-#################################
+##########################################################################################################
+# ACCESS DATA WITH dict/list OPS                                                                         #
+# Extensive indexing and accesing posiblilites http://pandas.pydata.org/pandas-docs/stable/indexing.html #
+##########################################################################################################
 # print type(cities['Population'])
-# print type(cities['Population'][1])  # Extensive indexing and accesing posiblilites http://pandas.pydata.org/pandas-docs/stable/indexing.html
+# print type(cities['Population'][1])
 
 #########################
-# ARITHNETIC OPERATIONS #
+# ARITHMETIC OPERATIONS #
 #########################
 # for p in population:
 #     print p

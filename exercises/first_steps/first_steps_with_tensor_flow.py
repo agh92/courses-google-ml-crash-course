@@ -14,7 +14,8 @@ pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
 california_housing_dataframe = pd.read_csv("../data/california_housing_train.csv", sep=",")
 # randomize to prevent ordering effects
-california_housing_dataframe = california_housing_dataframe.reindex(np.random.permutation(california_housing_dataframe.index))
+california_housing_dataframe = california_housing_dataframe.reindex(
+    np.random.permutation(california_housing_dataframe.index))
 # scale median house value to make the learning process easier
 california_housing_dataframe['median_house_value'] /= 1000
 print california_housing_dataframe.describe()
@@ -42,7 +43,7 @@ linear_regressor = tf.estimator.LinearRegressor(feature_columns=feature_column_t
 # DO THE TRAINING #
 ###################
 # my_input_fn gets called 1 time
-_ = linear_regressor.train(input_fn= lambda : my_input_fn(total_rooms_feature, targets),
+_ = linear_regressor.train(input_fn=lambda: my_input_fn(total_rooms_feature, targets),
                            steps=100)
 
 ############
@@ -82,7 +83,7 @@ x_max = sample["total_rooms"].max()
 weight = linear_regressor.get_variable_value('linear/linear_model/total_rooms/weights')[0]
 bias = linear_regressor.get_variable_value('linear/linear_model/bias_weights')
 # Get the predicted median_house_values for the min and max total_rooms values.
-y_min = bias + weight * x_min # -> Linear function y = b + wx
+y_min = bias + weight * x_min  # -> Linear function y = b + wx
 y_max = bias + weight * x_max
 # Plot our regression line from (x_min, y_min) to (x_max, y_max).
 plt.plot([x_min, x_max], [y_min, y_max], c='r')
