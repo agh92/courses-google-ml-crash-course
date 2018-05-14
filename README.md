@@ -18,3 +18,11 @@ Code and exercises from [Google´s Machine Learning Crash Course](https://develo
 1. Analyse distribution to find outliers
 2. Use [`Series.apply`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.Series.apply.html#pandas.Series.apply) to replace or cut outliers out 
 3. Repeat steps 7 - 9 from above
+
+## Validation Strategy
+
+1. Load a **train data set**
+2. Load a **validation data set**
+3. Train the model with the **train set** and check the loss against the **validation set**
+4. Load a **test data set**
+5. Check the loss against the **test set** and not validation set 
