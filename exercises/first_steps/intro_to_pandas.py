@@ -64,7 +64,7 @@ print cities
 #########################
 # LOAD DATA FROM SOURCE #
 #########################
-california_housing_dataframe = pd.read_csv("../data/california_housing_train.csv", sep=",")
+california_housing_dataframe = pd.read_csv("../../data/california_housing_train.csv", sep=",")
 # Statistics
 # print california_housing_dataframe.describe()
 # First records

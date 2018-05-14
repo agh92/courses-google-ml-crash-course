@@ -2,7 +2,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
 import tensorflow as tf
-from miscelanius.functions import train_model
+from functions.training import train_model_single_feature
 
 #########
 # SETUP #
@@ -10,7 +10,7 @@ from miscelanius.functions import train_model
 tf.logging.set_verbosity(tf.logging.ERROR)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
-california_housing_dataframe = pd.read_csv("../data/california_housing_train.csv", sep=",")
+california_housing_dataframe = pd.read_csv("../../data/california_housing_train.csv", sep=",")
 # randomize to prevent ordering effects
 california_housing_dataframe = california_housing_dataframe.reindex(
     np.random.permutation(california_housing_dataframe.index))
@@ -24,7 +24,7 @@ california_housing_dataframe['median_house_value'] /= 1000
 california_housing_dataframe["rooms_per_person"] = (
         california_housing_dataframe['total_rooms'] / california_housing_dataframe['population'])
 # print california_housing_dataframe.describe()
-calibration_data = train_model(
+calibration_data = train_model_single_feature(
     data_frame=california_housing_dataframe,
     learning_rate=0.04,
     steps=500,
@@ -65,7 +65,7 @@ clipped_rooms_per_person = california_housing_dataframe["rooms_per_person"].appl
 # could also have replaced rooms_per_person with the clipped data as in the course solution
 california_housing_dataframe["clipped_rooms_per_person"] = clipped_rooms_per_person
 # Final RMSE = 111.83
-calibration_data_2 = train_model(
+calibration_data_2 = train_model_single_feature(
     data_frame=california_housing_dataframe,
     learning_rate=0.04,
     steps=500,
