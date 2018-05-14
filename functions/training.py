@@ -1,6 +1,5 @@
 import math
 from IPython import display
-from matplotlib import cm
 from matplotlib import pyplot as plt
 import numpy as np
 import pandas as pd
@@ -20,12 +19,19 @@ def custom_linear_regressor(learning_rate, feature_columns):
     )
 
 
+# convenience function
+def predict(linear_regressor, input_fn):
+    training_predictions = linear_regressor.predict(input_fn=input_fn)
+    return np.array([item['predictions'][0] for item in training_predictions])
+
+
 def train_model_single_feature(
         data_frame,
         learning_rate,
         steps,
         batch_size,
         input_feature="total_rooms",
+        my_target="median_house_value",
         show=True):
     """Trains a linear regression model of one feature.
 
@@ -45,14 +51,11 @@ def train_model_single_feature(
     steps_per_period = steps / periods
 
     # trained_examples_per_period = (batch_size * steps) / periods
-
-    my_feature = input_feature
-    my_feature_data = data_frame[[my_feature]].astype('float32')
-    my_label = "median_house_value"
-    targets = data_frame[my_label].astype('float32')
+    my_feature_data = data_frame[[input_feature]].astype('float32')
+    targets = data_frame[my_target].astype('float32')
 
     # Create feature columns.
-    feature_columns = [tf.feature_column.numeric_column(my_feature)]
+    feature_columns = [tf.feature_column.numeric_column(input_feature)]
 
     # Create input functions.
     training_input_fn = lambda: dp.my_input_fn(my_feature_data, targets, batchsize=batch_size)
@@ -64,8 +67,8 @@ def train_model_single_feature(
     plt.figure(figsize=(15, 6))
     plt.subplot(1, 2, 1)
     sample = data_frame.sample(n=300)
-    colors = ploting.state_line(sample=sample, my_feature=my_feature,
-                                my_label=my_label, periods=periods)
+    colors = ploting.plot_sample(sample=sample, my_feature=input_feature,
+                                 my_label=my_target, periods=periods)
 
     # Train the model, but do so inside a loop so that we can periodically assess
     # loss metrics.
@@ -79,8 +82,7 @@ def train_model_single_feature(
             steps=steps_per_period
         )
         # Take a break and compute predictions.
-        predictions = linear_regressor.predict(input_fn=prediction_input_fn)
-        predictions = np.array([item['predictions'][0] for item in predictions])
+        predictions = predict(linear_regressor, prediction_input_fn)
 
         # Compute loss.
         root_mean_squared_error = math.sqrt(
@@ -91,22 +93,14 @@ def train_model_single_feature(
         root_mean_squared_errors.append(root_mean_squared_error)
         # Finally, track the weights and biases over time.
         # Apply some math to ensure that the data and line are plotted neatly.
-        y_extents = np.array([0, sample[my_label].max()])
-
-        weight = linear_regressor.get_variable_value('linear/linear_model/%s/weights' % input_feature)[0]
-        bias = linear_regressor.get_variable_value('linear/linear_model/bias_weights')
-
-        x_extents = (y_extents - bias) / weight
-        x_extents = np.maximum(np.minimum(x_extents,
-                                          sample[my_feature].max()),
-                               sample[my_feature].min())
-        y_extents = weight * x_extents + bias
-        plt.plot(x_extents, y_extents, color=colors[period])
+        ploting.plot_linear_model(sample, my_target, linear_regressor, input_feature, colors[period])
     print "Model training finished."
 
     # Output a graph of loss metrics over periods.
     plt.subplot(1, 2, 2)
-    ploting.loss_over_periods({'training': root_mean_squared_errors}, show=show)
+    ploting.plot_loss_over_periods({'training': root_mean_squared_errors})
+    if show:
+        plt.show()
 
     # Output a table with calibration data.
     calibration_data = pd.DataFrame()
@@ -157,8 +151,7 @@ def train_model_multi_feature(
     # loss metrics.
     print "Training model..."
     print "RMSE (on training data):"
-    training_rmse = []
-    validation_rmse = []
+    validation_rmse, training_rmse = [], []
     for period in range(0, periods):
         # Train the model, starting from the prior state.
         linear_regressor.train(
@@ -166,11 +159,8 @@ def train_model_multi_feature(
             steps=steps_per_period,
         )
         # 2. Take a break and compute predictions.
-        training_predictions = linear_regressor.predict(input_fn=predict_training_input_fn)
-        training_predictions = np.array([item['predictions'][0] for item in training_predictions])
-
-        validation_predictions = linear_regressor.predict(input_fn=predict_validation_input_fn)
-        validation_predictions = np.array([item['predictions'][0] for item in validation_predictions])
+        training_predictions = predict(linear_regressor, predict_training_input_fn)
+        validation_predictions = predict(linear_regressor, predict_validation_input_fn)
 
         # Compute training and validation loss.
         training_root_mean_squared_error = math.sqrt(
@@ -185,6 +175,8 @@ def train_model_multi_feature(
     print "Model training finished."
 
     # Output a graph of loss metrics over periods.
-    ploting.loss_over_periods({"training": training_rmse, "validation": validation_rmse}, show=show)
+    ploting.plot_loss_over_periods({"training": training_rmse, "validation": validation_rmse})
+    if show:
+        plt.show()
 
     return linear_regressor
