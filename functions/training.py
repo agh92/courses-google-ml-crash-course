@@ -32,7 +32,7 @@ def train_model_single_feature(
         batch_size,
         input_feature="total_rooms",
         my_target="median_house_value",
-        show=True):
+        show=False):
     """Trains a linear regression model of one feature.
 
     total_number_of_trained_examples = steps * batch_size
@@ -63,12 +63,13 @@ def train_model_single_feature(
 
     linear_regressor = custom_linear_regressor(learning_rate, feature_columns)
 
-    # Set up to plot the state of our model's line each period.
-    plt.figure(figsize=(15, 6))
-    plt.subplot(1, 2, 1)
-    sample = data_frame.sample(n=300)
-    colors = ploting.plot_sample(sample=sample, my_feature=input_feature,
-                                 my_label=my_target, periods=periods)
+    if show:
+        # Set up to plot the state of our model's line each period.
+        plt.figure(figsize=(15, 6))
+        plt.subplot(1, 2, 1)
+        sample = data_frame.sample(n=300)
+        colors = ploting.plot_sample(sample=sample, my_feature=input_feature,
+                                     my_label=my_target, periods=periods)
 
     # Train the model, but do so inside a loop so that we can periodically assess
     # loss metrics.
@@ -91,15 +92,17 @@ def train_model_single_feature(
         print "  period %02d : %0.2f" % (period, root_mean_squared_error)
         # Add the loss metrics from this period to our list.
         root_mean_squared_errors.append(root_mean_squared_error)
+
         # Finally, track the weights and biases over time.
         # Apply some math to ensure that the data and line are plotted neatly.
-        ploting.plot_linear_model(sample, my_target, linear_regressor, input_feature, colors[period])
+        if show:
+            ploting.plot_linear_model(sample, my_target, linear_regressor, input_feature, colors[period])
     print "Model training finished."
 
     # Output a graph of loss metrics over periods.
-    plt.subplot(1, 2, 2)
-    ploting.plot_loss_over_periods({'training': root_mean_squared_errors})
     if show:
+        plt.subplot(1, 2, 2)
+        ploting.plot_loss_over_periods({'training': root_mean_squared_errors})
         plt.show()
 
     # Output a table with calibration data.
@@ -120,7 +123,7 @@ def train_model_multi_feature(
         learning_rate,
         steps,
         batch_size,
-        show=True):
+        show=False):
     periods = 10
     steps_per_period = steps / periods
 
@@ -175,8 +178,8 @@ def train_model_multi_feature(
     print "Model training finished."
 
     # Output a graph of loss metrics over periods.
-    ploting.plot_loss_over_periods({"training": training_rmse, "validation": validation_rmse})
     if show:
+        ploting.plot_loss_over_periods({"training": training_rmse, "validation": validation_rmse})
         plt.show()
 
     return linear_regressor

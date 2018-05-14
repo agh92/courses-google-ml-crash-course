@@ -1,5 +1,4 @@
 from matplotlib import pyplot as plt
-import numpy as np
 import pandas as pd
 import tensorflow as tf
 from functions.training import train_model_single_feature
