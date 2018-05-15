@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 import functions.data_processing as dp
-import functions.training as tr
+from functions import training as tr
 from sklearn import metrics
 
 #########
