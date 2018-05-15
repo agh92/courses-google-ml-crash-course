@@ -7,6 +7,7 @@ import functions.data_processing as dp
 from functions import training as tr
 from sklearn import metrics
 
+
 #########
 # SETUP #
 #########
@@ -18,7 +19,7 @@ pd.options.display.float_format = '{:.1f}'.format
 # TASK 3 #
 ##########
 # Load the train and validation data
-california_housing_dataframe = dp.load_data_frame_from_csv("../../data/california_housing_train.csv")
+california_housing_dataframe = dp.load_data_frame_from_csv("../data/california_housing_train.csv")
 
 training_set = dp.preprocess_features(california_housing_dataframe.head(12000))
 print training_set.describe()

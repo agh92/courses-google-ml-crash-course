@@ -60,6 +60,7 @@ def preprocess_features(data_frame):
     ]]
 
     processed_features = selected_features.copy()
+    # synthetic feature
     processed_features["rooms_per_person"] = (
             data_frame["total_rooms"] /
             data_frame["population"])
