@@ -59,15 +59,11 @@ assert minimal_features, "You must select at least one feature!"
 minimal_training_examples = training_examples[minimal_features]
 minimal_validation_examples = validation_examples[minimal_features]
 
-# Define the range of the binning
-min_latitude = math.trunc(minimal_training_examples['latitude'].min())
-max_latitude = int(math.ceil(minimal_training_examples['latitude'].max()))
-
 # LATITUDE_RANGES = zip(xrange(32, 44), xrange(33, 45))
-LATITUDE_RANGES = zip(xrange(min_latitude, max_latitude), xrange(min_latitude + 1, max_latitude + 1))
+LATITUDE_RANGES = None
 
-minimal_training_examples = cl.binning_feature(minimal_training_examples, LATITUDE_RANGES, 'latitude')
-minimal_validation_examples = cl.binning_feature(minimal_validation_examples, LATITUDE_RANGES, 'latitude')
+minimal_training_examples = cl.binning_feature(minimal_training_examples, 'latitude', LATITUDE_RANGES)
+minimal_validation_examples = cl.binning_feature(minimal_validation_examples, 'latitude', LATITUDE_RANGES)
 
 print minimal_training_examples.describe()
 print minimal_validation_examples.describe()

@@ -6,6 +6,12 @@ from tensorflow.python.data import Dataset
 
 
 def load_data_frame_from_csv(location, sep=","):
+    """
+
+    :param location:
+    :param sep:
+    :return:
+    """
     df = pd.read_csv(location, sep=sep)
     return df.reindex(np.random.permutation(df.index))
 
@@ -18,10 +24,10 @@ def construct_feature_columns(input_features):
     return set([tf.feature_column.numeric_column(my_feature) for my_feature in input_features])
 
 
-# This function tells TensorFlow how to preprocess the data, as well as how to batch, shuffle, and
-# repeat it during model training.
 def my_input_fn(features, targets, batchsize=1, shuffle=True, num_epochs=None):
-    """
+    """This function tells TensorFlow how to preprocess the data, as well as how to batch, shuffle, and
+        repeat it during model training.
+
     :param features: pandas DataFrame of features
     :param targets: pandas DataFrame of targets
     :param batchsize: Size of batches to be passed to the model
@@ -48,6 +54,10 @@ def my_input_fn(features, targets, batchsize=1, shuffle=True, num_epochs=None):
 
 # Following functions are only for the examples of california housing data
 def preprocess_features(data_frame):
+    """
+    :param data_frame: Data loaded from california housing examples as a DataFrame
+    :return: DataFrame containing selected and synthetic features of the california housing Data
+    """
     selected_features = data_frame[[
         "latitude",
         "longitude",
@@ -69,6 +79,10 @@ def preprocess_features(data_frame):
 
 
 def preprocess_targets(data_frame):
+    """
+    :param data_frame: Data loaded from california housing examples as a DataFrame
+    :return: DataFrame containing target to predict
+    """
     output_targets = pd.DataFrame()
     output_targets['median_house_value'] = (
             data_frame['median_house_value'] / 1000.0 )

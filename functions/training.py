@@ -10,7 +10,12 @@ from functions import ploting
 
 
 def custom_linear_regressor(learning_rate, feature_columns):
-    # Create a linear regressor object.
+    """Create a linear regressor object.
+
+    :param learning_rate:
+    :param feature_columns:
+    :return:
+    """
     my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
     my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
     return tf.estimator.LinearRegressor(
@@ -19,8 +24,13 @@ def custom_linear_regressor(learning_rate, feature_columns):
     )
 
 
-# convenience function
 def predict(linear_regressor, input_fn):
+    """Convenience function
+
+    :param linear_regressor:
+    :param input_fn:
+    :return:
+    """
     training_predictions = linear_regressor.predict(input_fn=input_fn)
     return np.array([item['predictions'][0] for item in training_predictions])
 
@@ -35,15 +45,17 @@ def train_model_single_feature(
         show=False):
     """Trains a linear regression model of one feature.
 
-    total_number_of_trained_examples = steps * batch_size
+        total_number_of_trained_examples = steps * batch_size
 
-    Args:
-      learning_rate: A `float`, the learning rate.
-      steps: A non-zero `int`, the total number of training steps/iterations. A training step
+    :param data_frame: A `DataFrame` object to work with.
+    :param learning_rate: A `float`, the learning rate.
+    :param steps: A non-zero `int`, the total number of training steps/iterations. A training step
         consists of a forward and backward pass using a single batch.
-      batch_size: A non-zero `int`, the batch size. Numbers of examples for a single step
-      input_feature: A `string` specifying a column from `california_housing_dataframe`
-        to use as input feature.
+    :param batch_size: A non-zero `int`, the batch size. Numbers of examples for a single step
+    :param input_feature: A `string` specifying a column to use as input feature.
+    :param my_target: A `string` specifying a column to use as target.
+    :param show: A `string` specifying whether to plot or not.
+    :return: A `DataFrame`containing the predictions and the targets to use as calibration data.
     """
     # periods controls the granularity of reporting -> modifying periods does not alter what your model learns
     periods = 10
@@ -123,7 +135,22 @@ def train_model_multi_feature(
         learning_rate,
         steps,
         batch_size,
-        show=False):
+        show=False,
+        my_target="median_house_value"):
+    """Trains a linear regression model using several features.
+
+    :param my_target: A `string` specifying a column to use as target.
+    :param training_examples:
+    :param training_targets:
+    :param validation_examples:
+    :param validation_targets:
+    :param learning_rate: A `float`, the learning rate.
+    :param steps: A non-zero `int`, the total number of training steps/iterations. A training step
+        consists of a forward and backward pass using a single batch.
+    :param batch_size: A non-zero `int`, the batch size. Numbers of examples for a single step
+    :param show: A `string` specifying whether to plot or not.
+    :return: The trained linear regression model
+    """
     periods = 10
     steps_per_period = steps / periods
 
@@ -132,20 +159,20 @@ def train_model_multi_feature(
     # Feed for training
     training_input_fn = lambda: dp.my_input_fn(
         training_examples,
-        training_targets['median_house_value'],
+        training_targets[my_target],
         batchsize=batch_size
     )
     # Feed to make predictions
     predict_training_input_fn = lambda: dp.my_input_fn(
         training_examples,
-        training_targets['median_house_value'],
+        training_targets[my_target],
         num_epochs=1,
         shuffle=False
     )
     # Feed to make validation
     predict_validation_input_fn = lambda: dp.my_input_fn(
         validation_examples,
-        validation_targets['median_house_value'],
+        validation_targets[my_target],
         num_epochs=1,
         shuffle=False
     )

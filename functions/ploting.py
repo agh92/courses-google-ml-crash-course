@@ -5,6 +5,11 @@ import numpy as np
 
 
 def plot_loss_over_periods(loss_periods_dict):
+    """
+
+    :param loss_periods_dict:
+    :return:
+    """
     plt.ylabel("RMSE")
     plt.xlabel("Periods")
     plt.title("Root Mean Squared Error vs. Periods")
@@ -15,6 +20,14 @@ def plot_loss_over_periods(loss_periods_dict):
 
 
 def plot_sample(sample, my_feature, my_label, periods):
+    """
+
+    :param sample:
+    :param my_feature:
+    :param my_label:
+    :param periods:
+    :return:
+    """
     plt.title("Learned Line by Period")
     plt.ylabel(my_label)
     plt.xlabel(my_feature)
@@ -23,6 +36,15 @@ def plot_sample(sample, my_feature, my_label, periods):
 
 
 def plot_linear_model(sample, my_label, linear_regressor, input_feature, color):
+    """
+
+    :param sample:
+    :param my_label:
+    :param linear_regressor:
+    :param input_feature:
+    :param color:
+    :return:
+    """
     # Finally, track the weights and biases over time.
     # Apply some math to ensure that the data and line are plotted neatly.
     y_extents = np.array([0, sample[my_label].max()])
