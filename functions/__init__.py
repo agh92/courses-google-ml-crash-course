@@ -4,4 +4,4 @@ import data_processing
 import cleaning
 
 
-__all__ = ['data_processing', 'ploting', 'training']
+__all__ = ['data_processing', 'ploting', 'training', 'cleaning']

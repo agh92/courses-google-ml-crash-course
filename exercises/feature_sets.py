@@ -1,3 +1,4 @@
+import math
 
 import pandas as pd
 import tensorflow as tf
@@ -29,7 +30,8 @@ validation_examples = dp.preprocess_features(california_housing_dataframe.tail(5
 validation_targets = dp.preprocess_targets(california_housing_dataframe.tail(5000))
 
 validation_examples['long_over_lat'] = validation_examples['longitude'] / validation_examples['latitude']
-validation_examples['income_over_lat'] = validation_examples['median_income'] / validation_examples['latitude']# print validation_examples.describe()
+validation_examples['income_over_lat'] = validation_examples['median_income'] / validation_examples['latitude']
+# print validation_examples.describe()
 # print validation_set.describe()
 
 correlation_dataframe = training_examples.copy()
@@ -44,23 +46,32 @@ plt.show()
 
 
 minimal_features = [
-    # 'median_income',
+    'median_income',
     # 'housing_median_age',
     # 'rooms_per_person',
-    # 'latitude',
-    'long_over_lat',
-    'income_over_lat'
+    'latitude'
+    # 'long_over_lat',
+    # 'income_over_lat'
 ]
 
 assert minimal_features, "You must select at least one feature!"
 
-# minimal_training_examples = training_examples[minimal_features]
-# minimal_validation_examples = validation_examples[minimal_features]
+minimal_training_examples = training_examples[minimal_features]
+minimal_validation_examples = validation_examples[minimal_features]
 
-LATITUDE_RANGES = zip(xrange(32, 44), xrange(33, 45))
+# Define the range of the binning
+min_latitude = math.trunc(minimal_training_examples['latitude'].min())
+max_latitude = int(math.ceil(minimal_training_examples['latitude'].max()))
 
-minimal_training_examples = cl.select_and_transform_features(training_examples, LATITUDE_RANGES)
-minimal_validation_examples = cl.select_and_transform_features(validation_examples, LATITUDE_RANGES)
+# LATITUDE_RANGES = zip(xrange(32, 44), xrange(33, 45))
+LATITUDE_RANGES = zip(xrange(min_latitude, max_latitude), xrange(min_latitude + 1, max_latitude + 1))
+
+minimal_training_examples = cl.binning_feature(minimal_training_examples, LATITUDE_RANGES, 'latitude')
+minimal_validation_examples = cl.binning_feature(minimal_validation_examples, LATITUDE_RANGES, 'latitude')
+
+print minimal_training_examples.describe()
+print minimal_validation_examples.describe()
+
 #
 # Don't forget to adjust these parameters.
 # learning_rate=0.001 steps=500 batch_size=5
@@ -77,7 +88,8 @@ minimal_validation_examples = cl.select_and_transform_features(validation_exampl
 # learning_rate=0.01 steps=500 batch_size=5
 # 'income_over_lat' 'long_over_lat' -> 166.34
 #
-# select_and_transform_features -> 139.81
+# binning_feature -> 139.81
+# binning_feature using dynamic range -> 111.36
 #
 tr.train_model_multi_feature(
     learning_rate=0.01,
