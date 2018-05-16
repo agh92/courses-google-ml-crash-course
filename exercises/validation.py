@@ -74,7 +74,7 @@ validation_targets = dp.preprocess_targets(california_housing_dataframe.tail(500
 # TASK 4 #
 ##########
 # Train the modell
-linear_regressor = tr.train_model_multi_feature(
+linear_regressor = tr.train_model_all_feature(
     learning_rate=0.00003,
     steps=500,
     batch_size=5,

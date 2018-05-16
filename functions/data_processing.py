@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -85,5 +84,5 @@ def preprocess_targets(data_frame):
     """
     output_targets = pd.DataFrame()
     output_targets['median_house_value'] = (
-            data_frame['median_house_value'] / 1000.0 )
+            data_frame['median_house_value'] / 1000.0)
     return output_targets

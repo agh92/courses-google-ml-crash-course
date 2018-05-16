@@ -87,7 +87,7 @@ print minimal_validation_examples.describe()
 # binning_feature -> 139.81
 # binning_feature using dynamic range -> 111.36
 #
-tr.train_model_multi_feature(
+tr.train_model_all_feature(
     learning_rate=0.01,
     steps=500,
     batch_size=5,

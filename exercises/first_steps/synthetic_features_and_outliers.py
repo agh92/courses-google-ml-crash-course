@@ -1,7 +1,7 @@
 from matplotlib import pyplot as plt
 import pandas as pd
 import tensorflow as tf
-from functions.training import train_model_single_feature
+from functions.training import train_model_multi_feature
 from functions.data_processing import load_data_frame_from_csv
 
 #########
@@ -23,7 +23,7 @@ california_housing_dataframe['median_house_value'] /= 1000
 california_housing_dataframe["rooms_per_person"] = (
         california_housing_dataframe['total_rooms'] / california_housing_dataframe['population'])
 # print california_housing_dataframe.describe()
-calibration_data = train_model_single_feature(
+calibration_data = train_model_multi_feature(
     data_frame=california_housing_dataframe,
     learning_rate=0.04,
     steps=500,
@@ -64,7 +64,7 @@ clipped_rooms_per_person = california_housing_dataframe["rooms_per_person"].appl
 # could also have replaced rooms_per_person with the clipped data as in the course solution
 california_housing_dataframe["clipped_rooms_per_person"] = clipped_rooms_per_person
 # Final RMSE = 111.83
-calibration_data_2 = train_model_single_feature(
+calibration_data_2 = train_model_multi_feature(
     data_frame=california_housing_dataframe,
     learning_rate=0.04,
     steps=500,
