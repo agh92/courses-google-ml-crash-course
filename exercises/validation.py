@@ -7,7 +7,6 @@ import functions.data_processing as dp
 from functions import training as tr
 from sklearn import metrics
 
-
 #########
 # SETUP #
 #########
@@ -21,15 +20,13 @@ pd.options.display.float_format = '{:.1f}'.format
 # Load the train and validation data
 california_housing_dataframe = dp.load_data_frame_from_csv("../data/california_housing_train.csv")
 
-training_set = dp.preprocess_features(california_housing_dataframe.head(12000))
-print training_set.describe()
-training_targets = dp.preprocess_targets(california_housing_dataframe.head(12000))
-#print training_targets.describe()
+training_set, training_targets, validation_set, validation_targets = dp.test_and_validation(
+    california_housing_dataframe)
 
-validation_set = dp.preprocess_features(california_housing_dataframe.tail(5000))
+print training_set.describe()
+# print training_targets.describe()
 print validation_set.describe()
-validation_targets = dp.preprocess_targets(california_housing_dataframe.tail(5000))
-#print validation_set.describe()
+# print validation_set.describe()
 
 ##########
 # TASK 1 #
@@ -74,7 +71,7 @@ validation_targets = dp.preprocess_targets(california_housing_dataframe.tail(500
 # TASK 4 #
 ##########
 # Train the modell
-linear_regressor = tr.train_model_all_feature(
+linear_regressor = tr.train_model_all_features(
     learning_rate=0.00003,
     steps=500,
     batch_size=5,
@@ -82,7 +79,6 @@ linear_regressor = tr.train_model_all_feature(
     training_targets=training_targets,
     validation_examples=validation_set,
     validation_targets=validation_targets)
-
 
 ##########
 # TASK 5 #

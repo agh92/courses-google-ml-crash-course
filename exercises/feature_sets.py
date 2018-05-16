@@ -17,20 +17,16 @@ pd.options.display.float_format = '{:.1f}'.format
 # Load the train and validation data
 california_housing_dataframe = dp.load_data_frame_from_csv("../data/california_housing_train.csv")
 
-training_examples = dp.preprocess_features(california_housing_dataframe.head(12000))
-training_targets = dp.preprocess_targets(california_housing_dataframe.head(12000))
+training_examples, training_targets, validation_examples, validation_targets = dp.test_and_validation(
+    california_housing_dataframe)
 
 training_examples['long_over_lat'] = training_examples['longitude'] / training_examples['latitude']
 training_examples['income_over_lat'] = training_examples['median_income'] / training_examples['latitude']
+validation_examples['long_over_lat'] = validation_examples['longitude'] / validation_examples['latitude']
+validation_examples['income_over_lat'] = validation_examples['median_income'] / validation_examples['latitude']
 
 # print training_examples.describe()
 # print training_targets.describe()
-
-validation_examples = dp.preprocess_features(california_housing_dataframe.tail(5000))
-validation_targets = dp.preprocess_targets(california_housing_dataframe.tail(5000))
-
-validation_examples['long_over_lat'] = validation_examples['longitude'] / validation_examples['latitude']
-validation_examples['income_over_lat'] = validation_examples['median_income'] / validation_examples['latitude']
 # print validation_examples.describe()
 # print validation_set.describe()
 
@@ -43,7 +39,6 @@ print correlation_dataframe.corr()
 
 plt.scatter(training_examples['latitude'], training_targets['median_house_value'])
 plt.show()
-
 
 minimal_features = [
     'median_income',
@@ -87,7 +82,7 @@ print minimal_validation_examples.describe()
 # binning_feature -> 139.81
 # binning_feature using dynamic range -> 111.36
 #
-tr.train_model_all_feature(
+tr.train_model_all_features(
     learning_rate=0.01,
     steps=500,
     batch_size=5,

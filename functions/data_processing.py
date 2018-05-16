@@ -1,3 +1,4 @@
+import math
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -49,6 +50,18 @@ def my_input_fn(features, targets, batchsize=1, shuffle=True, num_epochs=None):
     # define and return the batch of data
     features, labels = data_set.make_one_shot_iterator().get_next()
     return features, labels
+
+
+def test_and_validation(data_frame, examples_percentage=0.7):
+    count = len(data_frame.index)
+    examples_len = math.trunc(count * examples_percentage)
+    validation_len = math.trunc(count * (1.0 - examples_percentage))
+
+    training_examples = preprocess_features(data_frame.head(examples_len))
+    training_targets = preprocess_targets(data_frame.head(examples_len))
+    validation_examples = preprocess_features(data_frame.tail(validation_len))
+    validation_targets = preprocess_targets(data_frame.tail(validation_len))
+    return training_examples, training_targets, validation_examples, validation_targets
 
 
 # Following functions are only for the examples of california housing data

@@ -9,21 +9,6 @@ import functions.data_processing as dp
 from functions import ploting
 
 
-def custom_linear_regressor(learning_rate, feature_columns):
-    """Create a linear regressor object.
-
-    :param learning_rate:
-    :param feature_columns:
-    :return:
-    """
-    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
-    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
-    return tf.estimator.LinearRegressor(
-        feature_columns=feature_columns,
-        optimizer=my_optimizer
-    )
-
-
 def predict(linear_regressor, input_fn):
     """Convenience function
 
@@ -58,20 +43,20 @@ def train_model_multi_feature(
     :return: A `DataFrame`containing the predictions and the targets to use as calibration data.
     """
 
-    my_feature_data = data_frame[input_features] 
+    my_feature_data = data_frame[input_features]
     targets = data_frame[[my_target]]
 
     # As the data was not separated into validation and example sets do it
     count = len(data_frame.index)
     examples_len = math.trunc(count * 0.7)
     validation_len = math.trunc(count * 0.3)
-
+    # dont use dp.test_and_validation() because it would use all features
     training_examples = my_feature_data.head(examples_len)
     training_targets = dp.preprocess_targets(targets.head(examples_len))
     validation_examples = my_feature_data.tail(validation_len)
     validation_targets = dp.preprocess_targets(targets.tail(validation_len))
 
-    linear_regressor = train_model_all_feature(
+    linear_regressor = train_model_all_features(
         training_examples=training_examples,
         training_targets=training_targets,
         validation_examples=validation_examples,
@@ -94,7 +79,7 @@ def train_model_multi_feature(
     return calibration_data
 
 
-def train_model_all_feature(
+def train_model_all_features(
         training_examples,
         training_targets,
         validation_examples,
@@ -102,10 +87,12 @@ def train_model_all_feature(
         learning_rate,
         steps,
         batch_size,
+        optimizer=tf.train.GradientDescentOptimizer,
         show=False,
         my_target="median_house_value"):
     """Trains a linear regression model using several features.
 
+    :param optimizer:
     :param my_target: A `string` specifying a column to use as target.
     :param training_examples:
     :param training_targets:
@@ -124,7 +111,12 @@ def train_model_all_feature(
     # the exercise will output the loss value every (steps / periods) steps
     steps_per_period = steps / periods
 
-    linear_regressor = custom_linear_regressor(learning_rate, dp.construct_feature_columns(training_examples))
+    my_optimizer = optimizer(learning_rate=learning_rate)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+    linear_regressor = tf.estimator.LinearRegressor(
+        feature_columns=dp.construct_feature_columns(training_examples),
+        optimizer=my_optimizer
+    )
 
     # Feed for training
     training_input_fn = lambda: dp.my_input_fn(
