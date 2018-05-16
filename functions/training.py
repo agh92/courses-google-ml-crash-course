@@ -40,7 +40,7 @@ def train_model_single_feature(
         learning_rate,
         steps,
         batch_size,
-        input_feature="total_rooms",
+        input_features,
         my_target="median_house_value",
         show=False):
     """Trains a linear regression model of one feature.
@@ -52,7 +52,7 @@ def train_model_single_feature(
     :param steps: A non-zero `int`, the total number of training steps/iterations. A training step
         consists of a forward and backward pass using a single batch.
     :param batch_size: A non-zero `int`, the batch size. Numbers of examples for a single step
-    :param input_feature: A `string` specifying a column to use as input feature.
+    :param input_features: A `string` specifying a column to use as input feature.
     :param my_target: A `string` specifying a column to use as target.
     :param show: A `string` specifying whether to plot or not.
     :return: A `DataFrame`containing the predictions and the targets to use as calibration data.
@@ -63,24 +63,21 @@ def train_model_single_feature(
     steps_per_period = steps / periods
 
     # trained_examples_per_period = (batch_size * steps) / periods
-    my_feature_data = data_frame[[input_feature]].astype('float32')
+    my_feature_data = data_frame[input_features].astype('float32')
     targets = data_frame[my_target].astype('float32')
-
-    # Create feature columns.
-    feature_columns = [tf.feature_column.numeric_column(input_feature)]
 
     # Create input functions.
     training_input_fn = lambda: dp.my_input_fn(my_feature_data, targets, batchsize=batch_size)
     prediction_input_fn = lambda: dp.my_input_fn(my_feature_data, targets, num_epochs=1, shuffle=False)
 
-    linear_regressor = custom_linear_regressor(learning_rate, feature_columns)
+    linear_regressor = custom_linear_regressor(learning_rate, dp.construct_feature_columns(my_feature_data))
 
     if show:
         # Set up to plot the state of our model's line each period.
         plt.figure(figsize=(15, 6))
         plt.subplot(1, 2, 1)
         sample = data_frame.sample(n=300)
-        colors = ploting.plot_sample(sample=sample, my_feature=input_feature,
+        colors = ploting.plot_sample(sample=sample, my_feature=input_features,
                                      my_label=my_target, periods=periods)
 
     # Train the model, but do so inside a loop so that we can periodically assess
@@ -108,7 +105,7 @@ def train_model_single_feature(
         # Finally, track the weights and biases over time.
         # Apply some math to ensure that the data and line are plotted neatly.
         if show:
-            ploting.plot_linear_model(sample, my_target, linear_regressor, input_feature, colors[period])
+            ploting.plot_linear_model(sample, my_target, linear_regressor, input_features, colors[period])
     print "Model training finished."
 
     # Output a graph of loss metrics over periods.

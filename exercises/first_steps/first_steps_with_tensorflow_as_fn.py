@@ -22,7 +22,8 @@ california_housing_dataframe['median_house_value'] /= 1000
 #     data_frame=california_housing_dataframe,
 #     learning_rate=0.00001,
 #     steps=100,
-#     batch_size=1
+#     batch_size=1,
+#     input_feature=["total_rooms"]
 # )
 
 #####################################
@@ -33,7 +34,8 @@ california_housing_dataframe['median_house_value'] /= 1000
 #     data_frame=california_housing_dataframe,
 #     learning_rate=0.0001,
 #     steps=100,
-#     batch_size=1
+#     batch_size=1,
+#     input_feature=["total_rooms"]
 # )
 
 # Solution of the course -> RMSE = 167.79 -> Higher tha  above
@@ -41,7 +43,8 @@ california_housing_dataframe['median_house_value'] /= 1000
 #     data_frame=california_housing_dataframe,
 #     learning_rate=0.00002,
 #     steps=500,
-#     batch_size=1
+#     batch_size=1,
+#     input_feature=["total_rooms"]
 # )
 
 ##################################################################################################
@@ -53,7 +56,7 @@ train_model_single_feature(
     data_frame=california_housing_dataframe,
     learning_rate=0.00003,
     steps=900,
-    input_feature='population',
+    input_features=['population'],
     batch_size=4
 )
 
@@ -64,5 +67,5 @@ train_model_single_feature(
 #     learning_rate=0.00002,
 #     steps=1000,
 #     batch_size=5,
-#     input_feature="population"
+#     input_feature=["population"]
 # )

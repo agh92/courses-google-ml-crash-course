@@ -28,7 +28,7 @@ calibration_data = train_model_single_feature(
     learning_rate=0.04,
     steps=500,
     batch_size=5,
-    input_feature="rooms_per_person",
+    input_features=["rooms_per_person"],
     show=False
 )
 
@@ -69,7 +69,7 @@ calibration_data_2 = train_model_single_feature(
     learning_rate=0.04,
     steps=500,
     batch_size=5,
-    input_feature="clipped_rooms_per_person",
+    input_features=["clipped_rooms_per_person"],
     show=False
 )
 _ = california_housing_dataframe["clipped_rooms_per_person"].hist()
