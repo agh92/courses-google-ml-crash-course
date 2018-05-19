@@ -37,7 +37,7 @@ def train_model_multi_feature(
     :param steps: A non-zero `int`, the total number of training steps/iterations. A training step
         consists of a forward and backward pass using a single batch.
     :param batch_size: A non-zero `int`, the batch size. Numbers of examples for a single step
-    :param input_features: A `string` specifying a column to use as input feature.
+    :param input_features: A `string` or `list` of strings specifying the columns to use as input feature.
     :param my_target: A `string` specifying a column to use as target.
     :param show: A `string` specifying whether to plot or not.
     :return: A `DataFrame`containing the predictions and the targets to use as calibration data.
@@ -87,11 +87,13 @@ def train_model_all_features(
         learning_rate,
         steps,
         batch_size,
+        feature_columns=None,
         optimizer=tf.train.GradientDescentOptimizer,
         show=False,
         my_target="median_house_value"):
     """Trains a linear regression model using several features.
 
+    :param feature_columns:
     :param optimizer:
     :param my_target: A `string` specifying a column to use as target.
     :param training_examples:
@@ -111,10 +113,13 @@ def train_model_all_features(
     # the exercise will output the loss value every (steps / periods) steps
     steps_per_period = steps / periods
 
+    if feature_columns is None:
+        feature_columns = dp.construct_feature_columns(training_examples),
+
     my_optimizer = optimizer(learning_rate=learning_rate)
     my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
     linear_regressor = tf.estimator.LinearRegressor(
-        feature_columns=dp.construct_feature_columns(training_examples),
+        feature_columns=feature_columns,
         optimizer=my_optimizer
     )
 

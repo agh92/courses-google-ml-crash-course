@@ -53,6 +53,12 @@ def my_input_fn(features, targets, batchsize=1, shuffle=True, num_epochs=None):
 
 
 def test_and_validation(data_frame, examples_percentage=0.7):
+    """
+
+    :param data_frame:
+    :param examples_percentage:
+    :return:
+    """
     count = len(data_frame.index)
     examples_len = math.trunc(count * examples_percentage)
     validation_len = math.trunc(count * (1.0 - examples_percentage))
