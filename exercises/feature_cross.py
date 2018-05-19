@@ -39,7 +39,7 @@ _ = tr.train_model_all_features(
     batch_size=100,
     feature_columns=cl.bucketize_feature_columns(training_examples,
                                                  ["households", "longitude", "latitude", "housing_median_age",
-                                                  "median_income", "rooms_per_person"]),
+                                                  "median_income", "rooms_per_person"], [['latitude', 'longitude']]),
     training_examples=training_examples,
     training_targets=training_targets,
     validation_examples=validation_examples,

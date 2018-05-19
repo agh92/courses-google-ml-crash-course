@@ -43,25 +43,30 @@ def get_quantile_based_boundaries(feature_values, num_buckets):
 def bucketize_feature_columns(training_examples, features, cross_features=None):
     """Construct the TensorFlow Feature Columns.
 
+    :param cross_features: list of lists containing features to cross together
+
     Returns:
       A set of feature columns
+
     """
 
     feature_columns = set()
     # TASK 1 OF FEATURE_CROSS THE COMMENTED LINE SHOULD BE A BETTER AND DYNAMIC WAY TO GET THE NUMBER OF BUCKETS
     buckets_count = 10  # math.trunc(math.sqrt(len(training_examples.index)))
 
+    feature_bucket = dict()
+
     for feature in features:
         numeric_feature = tf.feature_column.numeric_column(feature)
         bucketized_feature = tf.feature_column.bucketized_column(
             numeric_feature, boundaries=get_quantile_based_boundaries(training_examples[feature], buckets_count))
-        if feature == 'longitude':
-            bucket_logitude = bucketized_feature
-        if feature == 'latitude':
-            bucket_latitude = bucketized_feature
+        feature_bucket[feature] = bucketized_feature
         feature_columns.add(bucketized_feature)
 
-    # build the feature cross will only work with the california housing example
-    feature_columns.add(tf.feature_column.crossed_column([bucket_latitude, bucket_logitude], 1000))
+    for features_list in cross_features:
+        buckets = []
+        for feature in features_list:
+            buckets.append(feature_bucket[feature])
+        feature_columns.add(tf.feature_column.crossed_column(buckets, 1000))
 
     return feature_columns
