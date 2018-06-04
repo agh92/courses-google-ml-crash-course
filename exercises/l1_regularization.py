@@ -16,8 +16,8 @@ training_examples, training_targets, validation_examples, validation_targets = d
 
 linear_classifier = tr.train_linear_classifier_model_l1(
     learning_rate=0.1,
-    # TWEAK THE REGULARIZATION VALUE BELOW -> 0.15: 90 Dimensions, 0.1:684  Dimensions, 0.01: 90 Dimensions
-    regularization_strength=0.15,
+    # TWEAK THE REGULARIZATION VALUE BELOW -> 0.3: 648 Dimensions, 0.15: 683 Dimensions, 0.1:684
+    regularization_strength=0.3,
     steps=300,
     batch_size=100,
     feature_columns=bucketize_feature_columns(training_examples,
