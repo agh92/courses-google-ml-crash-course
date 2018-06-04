@@ -245,3 +245,77 @@ def train_linear_classifier_model(
                                         "validation": validation_log_losses})
         plt.show()
     return linear_classifier
+
+
+def train_linear_classifier_model_l1(
+        learning_rate,
+        regularization_strength,
+        steps,
+        batch_size,
+        feature_columns,
+        training_examples,
+        training_targets,
+        validation_examples,
+        validation_targets,
+        label="median_house_value_is_high",
+        show=False):
+
+    periods = 7
+    steps_per_period = steps / periods
+
+    # Create a linear classifier object.
+    my_optimizer = tf.train.FtrlOptimizer(learning_rate=learning_rate,
+                                          l1_regularization_strength=regularization_strength)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+    linear_classifier = tf.estimator.LinearClassifier(
+        feature_columns=feature_columns,
+        optimizer=my_optimizer
+    )
+
+    # Create input functions.
+    training_input_fn = lambda: dp.my_input_fn(training_examples,
+                                               training_targets[label],
+                                               batchsize=batch_size)
+    predict_training_input_fn = lambda: dp.my_input_fn(training_examples,
+                                                    training_targets[label],
+                                                    num_epochs=1,
+                                                    shuffle=False)
+    predict_validation_input_fn = lambda: dp.my_input_fn(validation_examples,
+                                                      validation_targets[label],
+                                                      num_epochs=1,
+                                                      shuffle=False)
+
+    # Train the model, but do so inside a loop so that we can periodically assess
+    # loss metrics.
+    print "Training model..."
+    print "LogLoss (on validation data):"
+    training_log_losses, validation_log_losses = [], []
+    for period in range(0, periods):
+        # Train the model, starting from the prior state.
+        linear_classifier.train(
+            input_fn=training_input_fn,
+            steps=steps_per_period
+        )
+        # Take a break and compute predictions.
+        training_probabilities = linear_classifier.predict(input_fn=predict_training_input_fn)
+        training_probabilities = np.array([item['probabilities'] for item in training_probabilities])
+
+        validation_probabilities = linear_classifier.predict(input_fn=predict_validation_input_fn)
+        validation_probabilities = np.array([item['probabilities'] for item in validation_probabilities])
+
+        # Compute training and validation loss.
+        training_log_loss = metrics.log_loss(training_targets, training_probabilities)
+        validation_log_loss = metrics.log_loss(validation_targets, validation_probabilities)
+        # Occasionally print the current loss.
+        print "  period %02d : %0.2f" % (period, validation_log_loss)
+        # Add the loss metrics from this period to our list.
+        training_log_losses.append(training_log_loss)
+        validation_log_losses.append(validation_log_loss)
+    print "Model training finished."
+
+    if show:
+        ploting.plot_loss_over_periods({"training": training_log_losses,
+                                        "validation": validation_log_losses})
+        plt.show()
+
+    return linear_classifier

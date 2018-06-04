@@ -40,26 +40,42 @@ def get_quantile_based_boundaries(feature_values, num_buckets):
     return [quantiles[q] for q in quantiles.keys()]
 
 
+feature_bucktes_count = {
+    "households": 10,
+    "longitude": 50,
+    "latitude": 50,
+    "housing_median_age": 10,
+    "median_income": 10,
+    "total_rooms": 10,
+    "total_bedrooms": 10,
+    "rooms_per_person": 10,
+    "population": 10
+}
+
+
 def bucketize_feature_columns(training_examples, features, cross_features=None):
     """Construct the TensorFlow Feature Columns.
-
     :param cross_features: list of lists containing features to cross together
-
     Returns:
       A set of feature columns
 
     """
 
+    if cross_features is None:
+        cross_features = []
+
     feature_columns = set()
     # TASK 1 OF FEATURE_CROSS THE COMMENTED LINE SHOULD BE A BETTER AND DYNAMIC WAY TO GET THE NUMBER OF BUCKETS
-    buckets_count = 10  # math.trunc(math.sqrt(len(training_examples.index)))
+    # In the exercises of the curs they use different number of buckets for different features,
+    # to save some code all feature will have the same number of buckets
+    buckets_count = 10  # math.ceil(math.sqrt(len(training_examples.index))) -> Should give the best number of buckets but does not work
 
     feature_bucket = dict()
 
     for feature in features:
         numeric_feature = tf.feature_column.numeric_column(feature)
         bucketized_feature = tf.feature_column.bucketized_column(
-            numeric_feature, boundaries=get_quantile_based_boundaries(training_examples[feature], buckets_count))
+            numeric_feature, boundaries=get_quantile_based_boundaries(training_examples[feature], feature_bucktes_count[feature]))
         feature_bucket[feature] = bucketized_feature
         feature_columns.add(bucketized_feature)
 
