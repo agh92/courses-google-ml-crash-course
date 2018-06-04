@@ -86,7 +86,7 @@ linear_regressor = tr.train_model_all_features(
 # Load test data
 california_housing_test_dataframe = dp.load_data_frame_from_csv("../../data/california_housing_test.csv")
 test_set = dp.preprocess_features(california_housing_test_dataframe)
-test_targets = dp.preprocess_targets(california_housing_test_dataframe)
+test_targets = dp.preprocess_continuous_target(california_housing_test_dataframe)
 # Feed test data
 predict_test_input_fn = lambda: dp.my_input_fn(
     test_set,

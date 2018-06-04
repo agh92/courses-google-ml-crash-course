@@ -52,7 +52,7 @@ def my_input_fn(features, targets, batchsize=1, shuffle=True, num_epochs=None):
     return features, labels
 
 
-def test_and_validation(data_frame, examples_percentage=0.7):
+def test_and_validation(data_frame, examples_percentage=0.7, binary=False):
     """
 
     :param data_frame:
@@ -64,9 +64,15 @@ def test_and_validation(data_frame, examples_percentage=0.7):
     validation_len = math.trunc(count * (1.0 - examples_percentage))
 
     training_examples = preprocess_features(data_frame.head(examples_len))
-    training_targets = preprocess_targets(data_frame.head(examples_len))
     validation_examples = preprocess_features(data_frame.tail(validation_len))
-    validation_targets = preprocess_targets(data_frame.tail(validation_len))
+
+    if not binary:
+        training_targets = preprocess_continuous_target(data_frame.head(examples_len))
+        validation_targets = preprocess_continuous_target(data_frame.tail(validation_len))
+    else:
+        training_targets = preprocess_binary_target(data_frame.head(examples_len))
+        validation_targets = preprocess_binary_target(data_frame.tail(validation_len))
+
     return training_examples, training_targets, validation_examples, validation_targets
 
 
@@ -96,7 +102,13 @@ def preprocess_features(data_frame):
     return processed_features
 
 
-def preprocess_targets(data_frame):
+def preprocess_binary_target(data_frame):
+    output_targets = pd.DataFrame()
+    output_targets['median_house_value_is_high'] = (data_frame['median_house_value'] > 265000).astype(float)
+    return output_targets
+
+
+def preprocess_continuous_target(data_frame):
     """
     :param data_frame: Data loaded from california housing examples as a DataFrame
     :return: DataFrame containing target to predict

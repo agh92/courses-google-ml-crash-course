@@ -10,9 +10,9 @@ def plot_loss_over_periods(loss_periods_dict):
     :param loss_periods_dict:
     :return:
     """
-    plt.ylabel("RMSE")
+    plt.ylabel("LOSS")
     plt.xlabel("Periods")
-    plt.title("Root Mean Squared Error vs. Periods")
+    plt.title("LOSS vs. Periods")
     plt.tight_layout()
     for key, value in loss_periods_dict.items():
         plt.plot(value, label=key)

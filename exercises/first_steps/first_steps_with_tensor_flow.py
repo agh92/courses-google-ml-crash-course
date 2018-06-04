@@ -23,7 +23,7 @@ print california_housing_dataframe.describe()
 total_rooms_feature = california_housing_dataframe[['total_rooms']]
 feature_column_total_rooms = construct_feature_columns(total_rooms_feature)
 # target we want to predict
-targets = preprocess_targets(california_housing_dataframe)
+targets = preprocess_continuous_target(california_housing_dataframe)
 
 #######################
 # CONFIGURE THE MODEL #
