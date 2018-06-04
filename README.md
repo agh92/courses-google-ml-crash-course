@@ -1,6 +1,11 @@
 # google_ml_crash_course
 Code and exercises from [Google´s Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course/)
 
+Directories:
+* data: Contains training and test data for the examples
+* exercises: Contains all programming exercises of the course
+* functions: Python package containing code that is reusable across the examples.
+
 ## Steps to create a model
 
 1. Load data as pandas [`DataFrame`](https://pandas.pydata.org/pandas-docs/stable/generated/pandas.DataFrame.html)
