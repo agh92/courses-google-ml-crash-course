@@ -330,13 +330,15 @@ def train_nn_regression_model(
         training_targets,
         validation_examples,
         validation_targets,
-        show=False):
+        show=False,
+        my_optimizer=None):
 
     periods = 10
     steps_per_period = steps / periods
 
     # Create a DNNRegressor object.
-    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+    if my_optimizer is None:
+        my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
     my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
     dnn_regressor = tf.estimator.DNNRegressor(
         feature_columns=dp.construct_feature_columns(training_examples),
@@ -395,4 +397,4 @@ def train_nn_regression_model(
     print "Final RMSE (on training data):   %0.2f" % training_root_mean_squared_error
     print "Final RMSE (on validation data): %0.2f" % validation_root_mean_squared_error
 
-    return dnn_regressor
+    return dnn_regressor, training_rmse, validation_rmse

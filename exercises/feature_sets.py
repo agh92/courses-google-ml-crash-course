@@ -5,7 +5,7 @@ import tensorflow as tf
 import functions.data_processing as dp
 from functions import training as tr
 from matplotlib import pyplot as plt
-from functions import cleaning as cl
+from functions import normalization as cl
 
 #########
 # SETUP #

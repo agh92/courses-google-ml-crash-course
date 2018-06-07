@@ -10,7 +10,7 @@ tf.logging.set_verbosity(tf.logging.FATAL)
 pd.options.display.max_rows = 10
 pd.options.display.float_format = '{:.1f}'.format
 
-california_housing_dataframe = dp.load_data_frame_from_csv('../../data/california_housing_train.csv')
+california_housing_dataframe = dp.load_data_frame_from_csv('../data/california_housing_train.csv')
 
 training_examples, training_targets, validation_examples, validation_targets = dp.test_and_validation(
     california_housing_dataframe)
@@ -32,9 +32,9 @@ dnn = train_nn_regression_model(
     training_targets=training_targets,
     validation_examples=validation_examples,
     validation_targets=validation_targets,
-    show=True)
+    show=True)[0]
 
-california_housing_test_dataframe = dp.load_data_frame_from_csv("../../data/california_housing_test.csv")
+california_housing_test_dataframe = dp.load_data_frame_from_csv("../data/california_housing_test.csv")
 test_set = dp.preprocess_features(california_housing_test_dataframe)
 test_targets = dp.preprocess_continuous_target(california_housing_test_dataframe)
 # Feed test data

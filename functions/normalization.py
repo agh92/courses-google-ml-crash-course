@@ -1,6 +1,65 @@
 import math
 import numpy as np
 import tensorflow as tf
+import pandas as pd
+
+
+# WARNING only compatible with california housing data
+def normalize_california_data(examples_dataframe):
+    processed_features = pd.DataFrame()
+    # households, median_income and total_bedrooms all appear normally-distributed in a log space
+    processed_features["households"] = log_normalize(examples_dataframe["households"])
+    processed_features["median_income"] = log_normalize(examples_dataframe["median_income"])
+    processed_features["total_bedrooms"] = log_normalize(examples_dataframe["total_bedrooms"])
+    # latitude, longitude and housing_median_age would probably be better off just scaled linearly
+    processed_features["latitude"] = linear_scale(examples_dataframe["latitude"])
+    processed_features["longitude"] = linear_scale(examples_dataframe["longitude"])
+    processed_features["housing_median_age"] = linear_scale(examples_dataframe["housing_median_age"])
+    # population, totalRooms and rooms_per_person have a few extreme outliers. They seem too extreme for log
+    # normalization to help. So let's clip them instead.
+    processed_features["population"] = linear_scale(clip(examples_dataframe["population"], 0, 5000))
+    processed_features["rooms_per_person"] = linear_scale(clip(examples_dataframe["rooms_per_person"], 0, 5))
+    processed_features["total_rooms"] = linear_scale(clip(examples_dataframe["total_rooms"], 0, 10000))
+
+    return processed_features
+
+
+def log_normalize(series):
+    return series.apply(lambda x: math.log(x + 1.0))
+
+
+def clip(series, clip_to_min, clip_to_max):
+    return series.apply(lambda x: (min(max(x, clip_to_min), clip_to_max)))
+
+
+def z_score_normalize(series):
+    mean = series.mean()
+    std_dv = series.std()
+    return series.apply(lambda x: (x - mean) / std_dv)
+
+
+def binary_threshold(series, threshold):
+    return series.apply(lambda x: (1 if x > threshold else 0))
+
+
+def normalize_linear_scale(examples_dataframe):
+    df = pd.DataFrame()
+    for series in examples_dataframe:
+        df[series] = linear_scale(examples_dataframe[series])
+    return df
+
+
+def linear_scale(series):
+    """
+    It can be a good standard practice to normalize the inputs to fall within the range -1, 1. This helps SGD not get
+    stuck taking steps that are too large in one dimension, or too small in another.
+    :param series:
+    :return:
+    """
+    min_val = series.min()
+    max_val = series.max()
+    scale = (max_val - min_val) / 2.0
+    return series.apply(lambda x: ((x - min_val) / scale) - 1.0)
 
 
 def binning_feature(source_df, feature, ranges=None):
@@ -75,7 +134,8 @@ def bucketize_feature_columns(training_examples, features, cross_features=None):
     for feature in features:
         numeric_feature = tf.feature_column.numeric_column(feature)
         bucketized_feature = tf.feature_column.bucketized_column(
-            numeric_feature, boundaries=get_quantile_based_boundaries(training_examples[feature], feature_bucktes_count[feature]))
+            numeric_feature,
+            boundaries=get_quantile_based_boundaries(training_examples[feature], feature_bucktes_count[feature]))
         feature_bucket[feature] = bucketized_feature
         feature_columns.add(bucketized_feature)
 

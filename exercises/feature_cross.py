@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 from functions import data_processing as dp
 from functions import training as tr
-from functions import cleaning as cl
+from functions import normalization as cl
 
 #########
 # SETUP #

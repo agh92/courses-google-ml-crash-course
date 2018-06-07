@@ -2,7 +2,7 @@ import tensorflow as tf
 import pandas as pd
 from functions import data_processing as dp
 from functions import training as tr
-from functions.cleaning import bucketize_feature_columns
+from functions.normalization import bucketize_feature_columns
 from functions.utils import model_size
 
 tf.logging.set_verbosity(tf.logging.FATAL)
