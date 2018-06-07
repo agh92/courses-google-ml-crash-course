@@ -319,3 +319,80 @@ def train_linear_classifier_model_l1(
         plt.show()
 
     return linear_classifier
+
+
+def train_nn_regression_model(
+        learning_rate,
+        steps,
+        batch_size,
+        hidden_units,
+        training_examples,
+        training_targets,
+        validation_examples,
+        validation_targets,
+        show=False):
+
+    periods = 10
+    steps_per_period = steps / periods
+
+    # Create a DNNRegressor object.
+    my_optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
+    my_optimizer = tf.contrib.estimator.clip_gradients_by_norm(my_optimizer, 5.0)
+    dnn_regressor = tf.estimator.DNNRegressor(
+        feature_columns=dp.construct_feature_columns(training_examples),
+        hidden_units=hidden_units,
+        optimizer=my_optimizer,
+    )
+
+    # Create input functions.
+    training_input_fn = lambda: dp.my_input_fn(training_examples,
+                                            training_targets["median_house_value"],
+                                            batchsize=batch_size)
+    predict_training_input_fn = lambda: dp.my_input_fn(training_examples,
+                                                    training_targets["median_house_value"],
+                                                    num_epochs=1,
+                                                    shuffle=False)
+    predict_validation_input_fn = lambda: dp.my_input_fn(validation_examples,
+                                                      validation_targets["median_house_value"],
+                                                      num_epochs=1,
+                                                      shuffle=False)
+
+    # Train the model, but do so inside a loop so that we can periodically assess
+    # loss metrics.
+    print "Training model..."
+    print "RMSE (on training data):"
+    training_rmse = []
+    validation_rmse = []
+    for period in range(0, periods):
+        # Train the model, starting from the prior state.
+        dnn_regressor.train(
+            input_fn=training_input_fn,
+            steps=steps_per_period
+        )
+        # Take a break and compute predictions.
+        training_predictions = predict(dnn_regressor, predict_training_input_fn)
+
+        validation_predictions = predict(dnn_regressor, predict_validation_input_fn)
+
+        # Compute training and validation loss.
+        training_root_mean_squared_error = math.sqrt(
+            metrics.mean_squared_error(training_predictions, training_targets))
+        validation_root_mean_squared_error = math.sqrt(
+            metrics.mean_squared_error(validation_predictions, validation_targets))
+        # Occasionally print the current loss.
+        print "  period %02d : %0.2f" % (period, training_root_mean_squared_error)
+        # Add the loss metrics from this period to our list.
+        training_rmse.append(training_root_mean_squared_error)
+        validation_rmse.append(validation_root_mean_squared_error)
+    print "Model training finished."
+
+    # Output a graph of loss metrics over periods.
+    if show:
+        ploting.plot_loss_over_periods({"training": training_rmse,
+                                        "validation": validation_rmse})
+        plt.show()
+
+    print "Final RMSE (on training data):   %0.2f" % training_root_mean_squared_error
+    print "Final RMSE (on validation data): %0.2f" % validation_root_mean_squared_error
+
+    return dnn_regressor
