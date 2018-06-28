@@ -1,4 +1,4 @@
-# google_ml_crash_course
+# google-ml-crash-course
 Code and exercises from [Google´s Machine Learning Crash Course](https://developers.google.com/machine-learning/crash-course/)
 
 Directories:
